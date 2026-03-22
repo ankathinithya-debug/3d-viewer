@@ -1,111 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>3D Upload Viewer</title>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-<style>
-body{
-margin:0;
-overflow:hidden;
-background:black;
-color:white;
-font-family:Arial;
-}
-
-#ui{
-position:fixed;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-}
-</style>
+<script type="module"
+src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+</script>
 
 </head>
-<body>
 
-<div id="ui">
-Upload 3D Model:
-<input type="file" id="upload" accept=".glb,.gltf">
-</div>
+<body style="background:black; color:white; text-align:center;">
+
+<h2>Upload 3D Model</h2>
+
+<input type="file" id="fileInput">
+
+<br><br>
+
+<model-viewer
+id="viewer"
+camera-controls
+auto-rotate
+style="width:600px;height:500px;"
+>
+</model-viewer>
 
 <script>
 
-let scene = new THREE.Scene();
+const input = document.getElementById("fileInput");
+const viewer = document.getElementById("viewer");
 
-let camera = new THREE.PerspectiveCamera(
-60,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-);
+input.addEventListener("change", function () {
 
-camera.position.set(0,1,5);
+const file = this.files[0];
 
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
+const url = URL.createObjectURL(file);
 
-document.body.appendChild(renderer.domElement);
-
-let controls = new THREE.OrbitControls(
-camera,
-renderer.domElement
-);
-
-controls.enableDamping = true;
-
-
-// lights
-
-scene.add(new THREE.AmbientLight(0xffffff,2));
-
-let light = new THREE.DirectionalLight(0xffffff,3);
-light.position.set(5,5,5);
-scene.add(light);
-
-
-let loader = new THREE.GLTFLoader();
-
-let model;
-
-
-document.getElementById("upload").addEventListener("change", e=>{
-
-let file = e.target.files[0];
-
-let url = URL.createObjectURL(file);
-
-loader.load(url, function(gltf){
-
-if(model) scene.remove(model);
-
-model = gltf.scene;
-
-model.scale.set(2,2,2);
-
-model.position.set(0,0,0);
-
-scene.add(model);
+viewer.src = url;
 
 });
-
-});
-
-
-function animate(){
-
-requestAnimationFrame(animate);
-
-controls.update();
-
-renderer.render(scene,camera);
-
-}
-
-animate();
 
 </script>
 
